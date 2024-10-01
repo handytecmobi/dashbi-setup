@@ -88,3 +88,62 @@ Add-App-To-Group -AppId $appScanBI.ObjectId -GrupoId $grupoScanBI.Id
 # Retornar una tabla con la información de las aplicaciones
 $table = @($appSync, $appPowerBI, $appScanBI)
 $table | Format-Table -Property AppName, AppId, TenantId
+# Preguntar si desea crear Power BI Embedded
+$createPowerBI = Read-Host "¿Desea crear un recurso de Power BI Embedded? (si/no)"
+
+if ($createPowerBI -eq "si") {
+    # Obtener la lista de suscripciones disponibles
+    $subscriptions = Get-AzSubscription
+
+    # Mostrar un menú con las suscripciones
+    Write-Host "Seleccione una suscripción ingresando el número correspondiente:"
+    for ($i = 0; $i -lt $subscriptions.Count; $i++) {
+        Write-Host "$i. $($subscriptions[$i].Name)"
+    }
+
+    # Pedir al usuario que seleccione una suscripción
+    $selectedIndex = Read-Host "Ingrese el número de la suscripción"
+    Write-Host "subscriptions.Count"
+    Write-Host $subscriptions.Count
+    Write-Host "selectedIndex"
+    Write-Host $selectedIndex
+    # Validar la entrada del usuario
+    if ($selectedIndex -ge 0 -or $selectedIndex -lt $subscriptions.Count) {
+        $selectedSubscription = $subscriptions[$selectedIndex]
+        # Establecer la suscripción seleccionada
+        Set-AzContext -SubscriptionId $selectedSubscription.Id
+        Write-Host "Suscripción '$($selectedSubscription.Name)' seleccionada."
+
+        # Preguntar al usuario el nombre del grupo de recursos
+        $resourceGroupName = Read-Host "Ingrese el nombre del grupo de recursos"
+
+        # Verificar si el grupo de recursos existe
+        $resourceGroup = Get-AzResourceGroup -Name $resourceGroupName -ErrorAction SilentlyContinue
+
+        if (-not $resourceGroup) {
+            # Si el grupo de recursos no existe, preguntar la región y crearlo
+            $region = Read-Host "El grupo de recursos no existe. Ingrese la región para crear el grupo de recursos"
+            New-AzResourceGroup -Name $resourceGroupName -Location $region
+            Write-Host "Grupo de recursos '$resourceGroupName' creado en la región '$region'."
+        } else {
+            Write-Host "El grupo de recursos '$resourceGroupName' ya existe."
+        }
+
+        # Preguntar al usuario el nombre del recurso de Power BI Embedded
+        $resourceName = Read-Host "Ingrese el nombre del recurso de Power BI Embedded"
+
+        # Preguntar al usuario la región donde se creará el recurso
+        $resourceRegion = Read-Host "Ingrese la región para el recurso de Power BI Embedded"
+
+        $pbieAdministrator = Read-Host "Ingrese el correo del administrador"
+
+        # Crear el recurso de Power BI Embedded
+        New-AzPowerBIEmbeddedCapacity -ResourceGroupName $resourceGroupName -Name $resourceName -Location $resourceRegion -Sku 'A1' -Administrator $pbieAdministrator
+
+        Write-Host "Recurso de Power BI Embedded '$resourceName' creado en el grupo de recursos '$resourceGroupName' en la región '$resourceRegion' con el SKU A1 y administrado por '$pbieAdministrator'."
+    } else {
+        Write-Host "Selección inválida. Por favor, intente de nuevo."
+    }
+} else {
+    Write-Host "Instalación finalizada."
+}
