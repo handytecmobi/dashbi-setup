@@ -103,10 +103,7 @@ if ($createPowerBI -eq "si") {
 
     # Pedir al usuario que seleccione una suscripción
     $selectedIndex = Read-Host "Ingrese el número de la suscripción"
-    Write-Host "subscriptions.Count"
-    Write-Host $subscriptions.Count
-    Write-Host "selectedIndex"
-    Write-Host $selectedIndex
+
     # Validar la entrada del usuario
     if ($selectedIndex -ge 0 -or $selectedIndex -lt $subscriptions.Count) {
         $selectedSubscription = $subscriptions[$selectedIndex]
