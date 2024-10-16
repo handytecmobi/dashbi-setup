@@ -130,7 +130,7 @@ if ($createPowerBI -eq "si") {
         $resourceName = Read-Host "Ingrese el nombre del recurso de Power BI Embedded"
 
         # Preguntar al usuario la región donde se creará el recurso
-        $resourceRegion = Read-Host "Ingrese la región para el recurso de Power BI Embedded"
+        $resourceRegion = Read-Host "Ingrese la región para el recurso de Power BI Embedded: Puedes guiarte en el siguiente link https://gist.github.com/ausfestivus/04e55c7d80229069bf3bc75870630ec8#results"
 
         $pbieAdministrator = Read-Host "Ingrese el correo del administrador"
 
